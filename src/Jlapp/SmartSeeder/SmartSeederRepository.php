@@ -72,7 +72,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface
             $env = App::environment();
         }
 
-        return $this->table()->where('env', '=', $env)->pluck('seed')->toArray();
+        return $this->table()->where('env', '=', $env)->pluck('seed');
     }
 
     /**
