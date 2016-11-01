@@ -135,13 +135,14 @@ class SeedMigrator extends Migrator
     /**
      * Run "down" a migration instance.
      *
-     * @param  object $seed
-     * @param  bool   $pretend
+     * @param  string  $file
+     * @param  object  $seed
+     * @param  bool    $pretend
      * @return void
      */
-    protected function runDown($seed, $pretend)
+    protected function runDown($file, $seed, $pretend)
     {
-        $file = $seed->seed;
+        $file = is_null($file) ? $seed->seed : $file;
 
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a

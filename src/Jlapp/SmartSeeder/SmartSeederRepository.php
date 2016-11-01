@@ -76,6 +76,25 @@ class SmartSeederRepository implements MigrationRepositoryInterface
     }
 
     /**
+     * Get list of migrations.
+     *
+     * @param  int $steps
+     * @return array
+     */
+    public function getMigrations($steps)
+    {
+        $env = $this->env;
+
+        if (empty($env)) {
+            $env = App::environment();
+        }
+
+        $query = $this->table()->where('env', '=', $env)->where('batch', '>=', '1');
+
+        return $query->orderBy('seed', 'desc')->take($steps)->get()->all();
+    }
+
+    /**
      * Get the last migration batch.
      *
      * @return array
