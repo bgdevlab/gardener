@@ -69,7 +69,7 @@ class SeedRollbackCommand extends Command
             $this->migrator->setEnv($env);
         }
 
-        $this->migrator->rollback($pretend);
+        $this->migrator->rollback([database_path(config('seeds.dir'))], $this->input->getOptions(), $pretend);
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having

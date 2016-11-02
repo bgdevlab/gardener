@@ -9,6 +9,7 @@ use Illuminate\Console\AppNamespaceDetectorTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 
 class SeedMigrator extends Migrator
 {
@@ -200,5 +201,53 @@ class SeedMigrator extends Migrator
         $fullPath = $this->getAppNamespace().$file;
 
         return new $fullPath();
+    }
+
+    /**
+     * Rollback the last migration operation.
+     *
+     * @param  array|string $paths
+     * @param  array  $options
+     * @return array
+     */
+    public function rollback($paths = [], array $options = [])
+    {
+        $this->notes = [];
+
+        $rolledBack = [];
+
+        // We want to pull in the last batch of migrations that ran on the previous
+        // migration operation. We'll then reverse those migrations and run each
+        // of them "down" to reverse the last migration "operation" which ran.
+        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+            $migrations = $this->repository->getMigrations($steps);
+        } else {
+            $migrations = $this->repository->getLast();
+        }
+//        dd($migrations,$paths);
+        $count = count($migrations);
+        $files = $this->getMigrationFiles($paths[0]);
+        if ($count === 0) {
+            $this->note('<info>Nothing to rollback.</info>');
+        } else {
+            // Next we will run through all of the migrations and call the "down" method
+            // which will reverse each migration in order. This getLast method on the
+            // repository already returns these migration's names in reverse order.
+            $this->requireFiles($files);
+
+
+            foreach ($migrations as $id => $migration) {
+                $migration = (object) $migration;
+                $rolledBack[] = $files[$id];
+
+                $this->runDown(
+                    $files[$id],
+                    $migration, Arr::get($options, 'pretend', false)
+                );
+            }
+
+        }
+
+        return $rolledBack;
     }
 }
