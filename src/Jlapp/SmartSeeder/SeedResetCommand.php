@@ -67,7 +67,7 @@ class SeedResetCommand extends Command
         $this->migrator->setConnection($this->input->getOption('database'));
 
         while (true) {
-            $count = $this->migrator->rollback($pretend);
+            $rolledBack = $this->migrator->rollback([database_path(config('seeds.dir'))], $this->input->getOptions(), $pretend);
 
             // Once the migrator has run we will grab the note output and send it out to
             // the console screen, since the migrator itself functions without having
@@ -76,7 +76,7 @@ class SeedResetCommand extends Command
                 $this->output->writeln($note);
             }
 
-            if ($count == 0) {
+            if (count($rolledBack) == 0) {
                 break;
             }
         }
