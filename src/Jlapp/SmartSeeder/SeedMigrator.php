@@ -38,6 +38,20 @@ class SeedMigrator extends Migrator
     }
 
     /**
+     * Require in all the migration files in a given path.
+     *
+     * @param  array   $files
+     * @return void
+     */
+    public function requireFiles(array $files)
+    {
+        return; // should they be autoloaded ?
+        foreach ($files as $file) {
+            $file = database_path(config('seeds.dir')).DIRECTORY_SEPARATOR.$file.'.php';
+            $this->files->requireOnce($file);
+        }
+    }
+    /**
      * Get all of the migration files in a given path.
      *
      * @param  string $path
